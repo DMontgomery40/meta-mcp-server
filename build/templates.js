@@ -6,18 +6,37 @@ export const TEMPLATES = {
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 
-const server = new Server(
-  {
-    name: "{{serverName}}",
-    version: "{{version}}",
-  },
-  {
-    capabilities: {},
-  }
-);
+async function main() {
+  const server = new Server(
+    {
+      name: "{{serverName}}",
+      version: "{{version}}",
+    },
+    {
+      capabilities: {},
+    }
+  );
 
-const transport = new StdioServerTransport();
-await server.connect(transport);`
+  // Setup error handling
+  server.onerror = (error) => {
+    console.error("[Server Error]", error);
+  };
+
+  process.on('SIGINT', async () => {
+    await server.close();
+    process.exit(0);
+  });
+
+  const transport = new StdioServerTransport();
+  await server.connect(transport);
+  
+  console.error("{{serverName}} running on stdio");
+}
+
+main().catch((error) => {
+  console.error("Fatal error:", error);
+  process.exit(1);
+});`
     },
     "resource-only": {
         name: "resource-only",
@@ -25,21 +44,70 @@ await server.connect(transport);`
         code: `#!/usr/bin/env node
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import {
+  ListResourcesRequestSchema,
+  ReadResourceRequestSchema,
+} from "@modelcontextprotocol/sdk/types.js";
 
-const server = new Server(
-  {
-    name: "{{serverName}}",
-    version: "{{version}}",
-  },
-  {
-    capabilities: {
-      resource: true
+async function main() {
+  const server = new Server(
+    {
+      name: "{{serverName}}",
+      version: "{{version}}",
     },
-  }
-);
+    {
+      capabilities: {
+        resources: {},
+      },
+    }
+  );
 
-const transport = new StdioServerTransport();
-await server.connect(transport);`
+  // Setup error handling
+  server.onerror = (error) => {
+    console.error("[Server Error]", error);
+  };
+
+  process.on('SIGINT', async () => {
+    await server.close();
+    process.exit(0);
+  });
+
+  // Example resource implementations
+  server.setRequestHandler(ListResourcesRequestSchema, async () => ({
+    resources: [
+      {
+        uri: "example://resource",
+        name: "Example Resource",
+        description: "An example resource to demonstrate functionality",
+        mimeType: "text/plain"
+      }
+    ]
+  }));
+
+  server.setRequestHandler(ReadResourceRequestSchema, async (request) => {
+    if (request.params.uri !== "example://resource") {
+      throw new Error(\`Unknown resource: \${request.params.uri}\`);
+    }
+
+    return {
+      contents: [{
+        uri: request.params.uri,
+        mimeType: "text/plain",
+        text: "This is an example resource content. Replace with your own implementation."
+      }]
+    };
+  });
+
+  const transport = new StdioServerTransport();
+  await server.connect(transport);
+  
+  console.error("{{serverName}} running on stdio");
+}
+
+main().catch((error) => {
+  console.error("Fatal error:", error);
+  process.exit(1);
+});`
     },
     "tool-only": {
         name: "tool-only",
@@ -47,21 +115,79 @@ await server.connect(transport);`
         code: `#!/usr/bin/env node
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import {
+  CallToolRequestSchema,
+  ListToolsRequestSchema,
+  Tool,
+} from "@modelcontextprotocol/sdk/types.js";
 
-const server = new Server(
-  {
-    name: "{{serverName}}",
-    version: "{{version}}",
-  },
-  {
-    capabilities: {
-      tool: true
+const EXAMPLE_TOOL: Tool = {
+  name: "example_tool",
+  description: "An example tool to demonstrate functionality",
+  inputSchema: {
+    type: "object",
+    properties: {
+      message: {
+        type: "string",
+        description: "Message to echo back",
+      }
     },
+    required: ["message"]
   }
-);
+};
 
-const transport = new StdioServerTransport();
-await server.connect(transport);`
+async function main() {
+  const server = new Server(
+    {
+      name: "{{serverName}}",
+      version: "{{version}}",
+    },
+    {
+      capabilities: {
+        tools: {},
+      },
+    }
+  );
+
+  // Setup error handling
+  server.onerror = (error) => {
+    console.error("[Server Error]", error);
+  };
+
+  process.on('SIGINT', async () => {
+    await server.close();
+    process.exit(0);
+  });
+
+  // Example tool implementations
+  server.setRequestHandler(ListToolsRequestSchema, async () => ({
+    tools: [EXAMPLE_TOOL]
+  }));
+
+  server.setRequestHandler(CallToolRequestSchema, async (request) => {
+    if (request.params.name !== "example_tool") {
+      throw new Error(\`Unknown tool: \${request.params.name}\`);
+    }
+
+    const args = request.params.arguments as { message: string };
+    return {
+      content: [{
+        type: "text",
+        text: \`Received message: \${args.message}\`
+      }]
+    };
+  });
+
+  const transport = new StdioServerTransport();
+  await server.connect(transport);
+  
+  console.error("{{serverName}} running on stdio");
+}
+
+main().catch((error) => {
+  console.error("Fatal error:", error);
+  process.exit(1);
+});`
     },
     full: {
         name: "full",
@@ -69,22 +195,108 @@ await server.connect(transport);`
         code: `#!/usr/bin/env node
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import {
+  CallToolRequestSchema,
+  ListResourcesRequestSchema,
+  ListToolsRequestSchema,
+  ReadResourceRequestSchema,
+  Tool,
+} from "@modelcontextprotocol/sdk/types.js";
 
-const server = new Server(
-  {
-    name: "{{serverName}}",
-    version: "{{version}}",
-  },
-  {
-    capabilities: {
-      resource: true,
-      tool: true
+const EXAMPLE_TOOL: Tool = {
+  name: "example_tool",
+  description: "An example tool to demonstrate functionality",
+  inputSchema: {
+    type: "object",
+    properties: {
+      message: {
+        type: "string",
+        description: "Message to echo back",
+      }
     },
+    required: ["message"]
   }
-);
+};
 
-const transport = new StdioServerTransport();
-await server.connect(transport);`
+async function main() {
+  const server = new Server(
+    {
+      name: "{{serverName}}",
+      version: "{{version}}",
+    },
+    {
+      capabilities: {
+        resources: {},
+        tools: {},
+      },
+    }
+  );
+
+  // Setup error handling
+  server.onerror = (error) => {
+    console.error("[Server Error]", error);
+  };
+
+  process.on('SIGINT', async () => {
+    await server.close();
+    process.exit(0);
+  });
+
+  // Example resource implementations
+  server.setRequestHandler(ListResourcesRequestSchema, async () => ({
+    resources: [
+      {
+        uri: "example://resource",
+        name: "Example Resource",
+        description: "An example resource to demonstrate functionality",
+        mimeType: "text/plain"
+      }
+    ]
+  }));
+
+  server.setRequestHandler(ReadResourceRequestSchema, async (request) => {
+    if (request.params.uri !== "example://resource") {
+      throw new Error(\`Unknown resource: \${request.params.uri}\`);
+    }
+
+    return {
+      contents: [{
+        uri: request.params.uri,
+        mimeType: "text/plain",
+        text: "This is an example resource content. Replace with your own implementation."
+      }]
+    };
+  });
+
+  // Example tool implementations
+  server.setRequestHandler(ListToolsRequestSchema, async () => ({
+    tools: [EXAMPLE_TOOL]
+  }));
+
+  server.setRequestHandler(CallToolRequestSchema, async (request) => {
+    if (request.params.name !== "example_tool") {
+      throw new Error(\`Unknown tool: \${request.params.name}\`);
+    }
+
+    const args = request.params.arguments as { message: string };
+    return {
+      content: [{
+        type: "text",
+        text: \`Received message: \${args.message}\`
+      }]
+    };
+  });
+
+  const transport = new StdioServerTransport();
+  await server.connect(transport);
+  
+  console.error("{{serverName}} running on stdio");
+}
+
+main().catch((error) => {
+  console.error("Fatal error:", error);
+  process.exit(1);
+});`
     }
 };
 export const PACKAGE_JSON_TEMPLATE = {
