@@ -21,28 +21,27 @@ The Meta MCP Server is a Model Context Protocol (MCP) based server designed to d
 
 1. Clone the repository:
    ```bash
-   git clone https://yourrepositoryurl.com/meta-mcp-server.git
+   git clone https://github.com/modelcontextprotocol/meta-mcp-server.git```
 Navigate to the server directory:
-bash
-Copy code
+```bash
 cd meta-mcp-server
+```
 Install the required NPM packages:
-bash
-Copy code
+```bash
 npm install
-Usage
-To start the server, run the following command in your terminal:
+```
 
-bash
-Copy code
+## Usage
+
+To start the server, run the following command in your terminal:
+```bash
 node index.js
+```
 This will initialize the meta-server, which will be ready to accept instructions for creating new MCP servers based on input parameters.
 
-Creating a New Server
-To request the meta-server to create a new MCP server, you need to provide a JSON payload with the following structure:
+### Configure in Claude Desktop
 
-json
-Copy code
+```
 {
   "outputDir": "path/to/output/directory",
   "files": [
@@ -60,13 +59,10 @@ All configuration details, including paths and server settings, are managed with
 Security
 This server does not implement advanced security measures and is intended for development purposes only. Ensure that it is operated in a secure environment, and consider implementing additional authentication and validation mechanisms for production use.
 
-Support
+## Support
 For support, feature requests, or to report bugs, please open an issue on the GitHub repository page.
 
-License
+## License
 This project is licensed under the MIT License - see the LICENSE file for details.
-
-vbnet
-Copy code
 
 This README aims to provide clear instructions on the setup, usage, and customization of the meta-server, as well as important notes on security and support.
