@@ -1,100 +1,72 @@
-# create-mcp-server
+# Meta MCP Server
 
-Interactive CLI tool to create Model Context Protocol (MCP) servers. This tool guides you through creating a customized MCP server and sets up a working development environment.
-
-## Quick Start
-
-Create a new MCP server:
-\`\`\`bash
-# Using npx (recommended)
-npx create-mcp-server
-
-# Or install globally
-npm install -g create-mcp-server
-create-mcp-server
-\`\`\`
-
-Follow the interactive prompts to customize your server.
+The Meta MCP Server is a Model Context Protocol (MCP) based server designed to dynamically generate and manage MCP servers as per user specifications. This meta-server enables the creation of MCP server files and directories through automated processes, making it ideal for rapid development and testing environments.
 
 ## Features
 
-- Interactive CLI with guided prompts
-- Multiple server templates:
-  - **Basic**: Simple server with no capabilities (for learning)
-  - **Resources**: Server that exposes data to Claude
-  - **Tools**: Server that lets Claude perform actions
-  - **Full**: Complete server with both resources and tools
-- Proper TypeScript setup
-- Development workflow with watch mode
-- Built-in MCP Inspector integration
-- Example implementations
+- **Dynamic Server Generation**: Allows for the creation of customized MCP servers by specifying directories and files to be created.
+- **Automated File Management**: Handles the creation of necessary directories and files for new servers automatically.
+- **MCP Tool Integration**: Utilizes the Model Context Protocol SDK to manage tools and resources efficiently.
+- **Error Handling**: Robust error management to ensure stability even when facing invalid inputs or system errors.
+- **Debugging Support**: Detailed logging and system prompts to aid in debugging and operational transparency.
 
-## Usage
+## Requirements
 
-When you run the tool, it will guide you through:
+- Node.js (version 12.x or later)
+- NPM (Node Package Manager)
+- Access to a command-line interface (CLI) or terminal
+- Basic understanding of JavaScript and server management
 
-1. Server name (package name format)
-2. Initial version 
-3. Template selection
-4. Output directory
+## Installation
 
-The tool will create a complete server project with:
-- TypeScript configuration
-- Build scripts
-- Development tools
-- Example implementations
-- Testing setup
+1. Clone the repository:
+   ```bash
+   git clone https://yourrepositoryurl.com/meta-mcp-server.git
+Navigate to the server directory:
+bash
+Copy code
+cd meta-mcp-server
+Install the required NPM packages:
+bash
+Copy code
+npm install
+Usage
+To start the server, run the following command in your terminal:
 
-## Development Workflow
+bash
+Copy code
+node index.js
+This will initialize the meta-server, which will be ready to accept instructions for creating new MCP servers based on input parameters.
 
-After creating your server:
+Creating a New Server
+To request the meta-server to create a new MCP server, you need to provide a JSON payload with the following structure:
 
-1. Install dependencies:
-   \`\`\`bash
-   npm install
-   \`\`\`
+json
+Copy code
+{
+  "outputDir": "path/to/output/directory",
+  "files": [
+    {
+      "path": "relative/path/to/file.js",
+      "content": "file content as a string"
+    }
+  ]
+}
+This JSON can be sent via a suitable MCP client that communicates with the meta-server through the MCP protocol.
 
-2. Start development mode:
-   \`\`\`bash
-   npm run dev
-   \`\`\`
+Configuration
+All configuration details, including paths and server settings, are managed within the config.json file. Modify this file to suit your environment and security requirements.
 
-3. Test with MCP Inspector:
-   \`\`\`bash
-   npm run inspector
-   \`\`\`
+Security
+This server does not implement advanced security measures and is intended for development purposes only. Ensure that it is operated in a secure environment, and consider implementing additional authentication and validation mechanisms for production use.
 
-## Server Templates
+Support
+For support, feature requests, or to report bugs, please open an issue on the GitHub repository page.
 
-### Basic Server
-- Minimal implementation
-- No capabilities
-- Good for learning MCP
+License
+This project is licensed under the MIT License - see the LICENSE file for details.
 
-### Resource Server
-- Exposes data to Claude
-- Example resource implementation
-- Resource listing and reading
+vbnet
+Copy code
 
-### Tool Server
-- Lets Claude perform actions
-- Example tool implementation
-- Tool listing and execution
-
-### Full Server
-- Both resources and tools
-- Complete example setup
-- Ready for real-world use
-
-## Contributing
-
-1. Clone the repository
-2. Install dependencies: \`npm install\`
-3. Build: \`npm run build\`
-4. Test your changes: \`npm start\`
-
-## Resources
-
-- [MCP Documentation](https://docs.modelcontextprotocol.ai)
-- [MCP TypeScript SDK](https://github.com/modelcontextprotocol/typescript-sdk)
-- [MCP Inspector](https://github.com/modelcontextprotocol/inspector)
+This README aims to provide clear instructions on the setup, usage, and customization of the meta-server, as well as important notes on security and support.
