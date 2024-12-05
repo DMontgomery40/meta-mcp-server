@@ -1,8 +1,10 @@
 # Meta MCP Server
 
-"Meta" because it's an MCP Server that Creates MCP Servers. And also because "suck it, Zuck, I got it first"
+"Meta" because it's an MCP Server that Creates MCP Servers. And also because "suck it, Zuck, I got it first" (seriously though I made that connection after the fact).
 
-## Features
+## Features 
+
+AI (poorly) Created Content:
 
 - **Dynamic Server Generation**: Allows for the creation of customized MCP servers by specifying directories and files to be created.
 - **Automated File Management**: Handles the creation of necessary directories and files for new servers automatically.
