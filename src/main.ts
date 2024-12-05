@@ -8,7 +8,7 @@ import {
   ReadResourceRequestSchema,
   Tool,
 } from "@modelcontextprotocol/sdk/types.js";
-import { TEMPLATES, PACKAGE_JSON_TEMPLATE, TSCONFIG_TEMPLATE } from "./templates.js";
+import { TEMPLATES, PACKAGE_JSON_TEMPLATE, TSCONFIG_TEMPLATE, TemplateKey } from "./templates.js";
 
 interface Template {
   name: string;
@@ -68,12 +68,15 @@ class MetaMCPServer {
   setupHandlers() {
     // List available templates as resources
     this.server.setRequestHandler(ListResourcesRequestSchema, async () => ({
-      resources: Object.values(TEMPLATES).map((template: Template) => ({
-        uri: `template://${template.name}`,
-        name: `Template: ${template.name}`,
-        description: template.description,
-        mimeType: "text/plain",
-      })),
+      resources: Object.values(TEMPLATES).map((value) => {
+        const template = value as Template;
+        return {
+          uri: `template://${template.name}`,
+          name: `Template: ${template.name}`, 
+          description: template.description,
+          mimeType: "text/plain",
+        };
+      }),
     }));
     // Read template contents
     this.server.setRequestHandler(ReadResourceRequestSchema, async (request) => {
@@ -82,7 +85,7 @@ class MetaMCPServer {
       if (!match) {
         throw new Error(`Invalid resource URI: ${uri}`);
       }
-      const templateName = match[1];
+      const templateName = match[1] as TemplateKey;
       const template = TEMPLATES[templateName];
       if (!template) {
         throw new Error(`Template not found: ${templateName}`);
@@ -105,16 +108,31 @@ class MetaMCPServer {
         throw new Error(`Unknown tool: ${request.params.name}`);
       }
       const args = request.params.arguments;
+      if (!args || typeof args !== 'object') {
+        throw new Error("Arguments are required and must be an object");
+      }
+      
+      // Validate required fields
+      const { name, version, template, outputDir } = args as Record<string, unknown>;
+      if (!name || !version || !template || !outputDir || 
+          typeof name !== 'string' || 
+          typeof version !== 'string' || 
+          typeof template !== 'string' || 
+          typeof outputDir !== 'string') {
+        throw new Error("Missing or invalid required fields");
+      }
+
+      const serverArgs: ServerArgs = { name, version, template, outputDir };
+      
       try {
-        await this.generateServer(args);
+        await this.generateServer(serverArgs);
         return {
           content: [{
             type: "text",
-            text: `Successfully generated MCP server in ${args.outputDir}`,
+            text: `Successfully generated MCP server in ${serverArgs.outputDir}`,
           }],
         };
-      }
-      catch (error) {
+      } catch (error) {
         return {
           content: [{
             type: "text",
@@ -130,7 +148,7 @@ class MetaMCPServer {
     await mkdir(args.outputDir, { recursive: true });
     await mkdir(`${args.outputDir}/src`, { recursive: true });
     // Get template
-    const template = TEMPLATES[args.template];
+    const template = TEMPLATES[args.template as TemplateKey];
     if (!template) {
       throw new Error(`Invalid template: ${args.template}`);
     }

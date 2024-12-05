@@ -2,13 +2,16 @@
   "name": "meta-mcp-server",
   "version": "1.0.0",
   "type": "module",
-  "description": "",
-  "main": "index.js",
+  "main": "build/main.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc"
+    "build": "tsc",
+    "start": "node build/main.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "0.6.0"
   },
   "devDependencies": {
-    "typescript": "^5.7.2"
+    "@types/node": "^20.11.24",
+    "typescript": "^5.3.3"
   }
 }
