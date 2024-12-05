@@ -3,7 +3,12 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import { CallToolRequestSchema, ListResourcesRequestSchema, ListToolsRequestSchema, ReadResourceRequestSchema, } from "@modelcontextprotocol/sdk/types.js";
 import { mkdir, writeFile } from "fs/promises";
 // Template definitions - these will be exposed as resources
-const TEMPLATES = {
+type TemplateKey = 'basic' | 'resource-only' | 'tool-only' | 'full';
+const TEMPLATES: Record<TemplateKey, {
+    name: string;
+    description: string;
+    code: string;
+}> = {
     basic: {
         name: "basic",
         description: "Basic MCP server with no capabilities",
