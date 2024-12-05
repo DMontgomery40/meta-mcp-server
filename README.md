@@ -31,4 +31,4 @@ For support, feature requests, or to report bugs, please open an issue on the Gi
 ## License
 This project is licensed under the MIT License - see the LICENSE file for details.
 
-This README aims to provide clear instructions on the setup, usage, and customization of the meta-server, as well as important notes on security and support.
+
