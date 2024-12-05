@@ -1,272 +1,151 @@
+#!/usr/bin/env node
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import { mkdir, writeFile } from "fs/promises";
+import { mkdir, writeFile, readFile } from "fs/promises";
+import path from 'path';
+import { fileURLToPath } from 'url';
 import {
-  CallToolRequestSchema,
-  ListResourcesRequestSchema,
-  ListToolsRequestSchema,
-  ReadResourceRequestSchema,
-  Tool,
+    CallToolRequestSchema,
+    ListToolsRequestSchema,
 } from "@modelcontextprotocol/sdk/types.js";
-import { TEMPLATES, PACKAGE_JSON_TEMPLATE, TSCONFIG_TEMPLATE, TemplateKey } from "./templates.js";
 
-interface ServerArgs {
-  name: string;
-  version: string;
-  template: string;
-  outputDir: string;
-}
+// Setup paths
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-const META_SERVER_TOOL: Tool = {
-  name: "create_mcp_server",
-  description: "Create a new MCP server from template",
-  inputSchema: {
-    type: "object",
-    properties: {
-      name: {
-        type: "string",
-        description: "Name of the server (package name format)",
-      },
-      version: {
-        type: "string",
-        description: "Server version (semver format)",
-      },
-      template: {
-        type: "string",
-        description: "Template to use (basic, resource-only, tool-only, or full)",
-        enum: ["basic", "resource-only", "tool-only", "full"],
-      },
-      outputDir: {
-        type: "string",
-        description: "Directory where the server should be generated",
-      },
-    },
-    required: ["name", "version", "template", "outputDir"],
-  },
+const CREATE_MCP_TOOL = {
+    name: "write_mcp_server",
+    description: "Write files for an MCP server based on our discussion with the user",
+    inputSchema: {
+        type: "object",
+        properties: {
+            outputDir: {
+                type: "string",
+                description: "Directory where server files should be created"
+            },
+            files: {
+                type: "array",
+                items: {
+                    type: "object",
+                    properties: {
+                        path: { type: "string" },
+                        content: { type: "string" }
+                    },
+                    required: ["path", "content"]
+                }
+            }
+        },
+        required: ["outputDir", "files"]
+    }
 };
 
-class MetaMCPServer {
-  private server: Server;
+class MetaServer {
+    private server: Server;
 
-  constructor() {
-    this.server = new Server(
-      {
-        name: "meta-mcp-server",
-        version: "1.0.0",
-      },
-      {
-        capabilities: {
-          resources: {},
-          tools: {},
-        },
-      }
-    );
+    constructor() {
+        this.server = new Server(
+            {
+                name: "meta-mcp-server",
+                version: "1.0.0",
+            },
+            {
+                capabilities: {
+                    tools: {}
+                }
+            }
+        );
 
-    this.setupHandlers();
-  }
-
-  private setupHandlers(): void {
-    // List available templates as resources
-    this.server.setRequestHandler(ListResourcesRequestSchema, async () => ({
-      resources: Object.entries(TEMPLATES).map(([key, template]) => ({
-        uri: `template://${key}`,
-        name: `Template: ${template.name}`,
-        description: template.description,
-        mimeType: "text/plain",
-      })),
-    }));
-
-    // Read template contents
-    this.server.setRequestHandler(ReadResourceRequestSchema, async (request) => {
-      const uri = request.params.uri;
-      const match = uri.match(/^template:\/\/(.+)$/);
-      
-      if (!match) {
-        throw new Error(`Invalid resource URI: ${uri}`);
-      }
-
-      const templateKey = match[1] as TemplateKey;
-      const template = TEMPLATES[templateKey];
-      
-      if (!template) {
-        throw new Error(`Template not found: ${templateKey}`);
-      }
-
-      return {
-        contents: [{
-          uri,
-          mimeType: "text/plain",
-          text: template.code,
-        }],
-      };
-    });
-
-    // List available tools
-    this.server.setRequestHandler(ListToolsRequestSchema, async () => ({
-      tools: [META_SERVER_TOOL],
-    }));
-
-    // Handle server creation
-    this.server.setRequestHandler(CallToolRequestSchema, async (request) => {
-      if (request.params.name !== "create_mcp_server") {
-        throw new Error(`Unknown tool: ${request.params.name}`);
-      }
-
-      const args = request.params.arguments;
-      if (!args || typeof args !== "object") {
-        throw new Error("Arguments are required and must be an object");
-      }
-
-      // Validate required fields
-      const { name, version, template, outputDir } = args as Record<string, unknown>;
-      if (!name || !version || !template || !outputDir ||
-          typeof name !== "string" ||
-          typeof version !== "string" ||
-          typeof template !== "string" ||
-          typeof outputDir !== "string") {
-        throw new Error("Missing or invalid required fields");
-      }
-
-      // Validate template
-      if (!Object.keys(TEMPLATES).includes(template)) {
-        throw new Error(`Invalid template: ${template}`);
-      }
-
-      const serverArgs: ServerArgs = { name, version, template, outputDir };
-
-      try {
-        await this.generateServer(serverArgs);
-        return {
-          content: [{
-            type: "text",
-            text: `Successfully generated MCP server in ${serverArgs.outputDir}`,
-          }],
-        };
-      } catch (error) {
-        console.error("Error generating server:", error);
-        return {
-          content: [{
-            type: "text",
-            text: `Failed to generate server: ${error instanceof Error ? error.message : String(error)}`,
-          }],
-          isError: true,
-        };
-      }
-    });
-  }
-
-  private async generateServer(args: ServerArgs): Promise<void> {
-    // Create directory structure
-    await mkdir(args.outputDir, { recursive: true });
-    await mkdir(`${args.outputDir}/src`, { recursive: true });
-
-    // Get template
-    const template = TEMPLATES[args.template as TemplateKey];
-    if (!template) {
-      throw new Error(`Invalid template: ${args.template}`);
+        this.setupHandlers();
     }
 
-    // Generate server code from template
-    const serverCode = template.code
-      .replace(/{{serverName}}/g, args.name)
-      .replace(/{{version}}/g, args.version);
+    private setupHandlers(): void {
+        this.server.setRequestHandler(ListToolsRequestSchema, async () => ({
+            tools: [CREATE_MCP_TOOL]
+        }));
 
-    // Generate package.json
-    const packageJson = JSON.stringify({
-      ...PACKAGE_JSON_TEMPLATE,
-      name: args.name,
-      version: args.version,
-      bin: {
-        [args.name]: "./build/index.js"
-      }
-    }, null, 2);
+        this.server.setRequestHandler(CallToolRequestSchema, async (request) => {
+            if (request.params.name !== "write_mcp_server") {
+                throw new Error(`Unknown tool: ${request.params.name}`);
+            }
 
-    // Generate tsconfig.json
-    const tsconfig = JSON.stringify(TSCONFIG_TEMPLATE, null, 2);
+            const args = request.params.arguments as {
+                outputDir: string;
+                files: Array<{
+                    path: string;
+                    content: string;
+                }>;
+            };
 
-    // Write files
-    await writeFile(`${args.outputDir}/src/index.ts`, serverCode);
-    await writeFile(`${args.outputDir}/package.json`, packageJson);
-    await writeFile(`${args.outputDir}/tsconfig.json`, tsconfig);
+            try {
+                await mkdir(args.outputDir, { recursive: true });
+                const createdFiles = [];
 
-    // Create basic README.md with more detailed instructions
-    const readme = `# ${args.name}
+                for (const file of args.files) {
+                    const fullPath = `${args.outputDir}/${file.path}`;
+                    await mkdir(fullPath.substring(0, fullPath.lastIndexOf('/')), { recursive: true });
+                    await writeFile(fullPath, file.content);
+                    createdFiles.push(file.path);
+                }
+                return {
+                    content: [{
+                        type: "text",
+                        text: `Successfully created MCP server:\n${createdFiles.map(f => `- ${f}`).join('\n')}`
+                    }]
+                };
 
-A Model Context Protocol server generated using meta-mcp-server.
+            } catch (error) {
+                console.error("Error creating server:", error);
+                return {
+                    content: [{
+                        type: "text",
+                        text: `Failed to create server: ${error instanceof Error ? error.message : String(error)}`
+                    }],
+                    isError: true
+                };
+            }
+        });
+    }
 
-## Installation
+    async run(): Promise<void> {
+        const transport = new StdioServerTransport();
+        await this.server.connect(transport);
 
-First, install dependencies:
-\`\`\`bash
-npm install
-\`\`\`
+        try {
+            // Load and output the system prompt
+            const promptPath = path.join(__dirname, '..', 'src', 'SYSTEM_PROMPT.md');
+            const systemPrompt = await readFile(promptPath, 'utf8');
+            
+            // Output it to stderr so it doesn't interfere with MCP communication
+            console.error(`
+=================================================================
+LOADING META MCP SERVER SYSTEM PROMPT - CRITICAL INSTRUCTIONS
+=================================================================
 
-Then build the server:
-\`\`\`bash 
-npm run build
-\`\`\`
+${systemPrompt}
 
-## Usage
+=================================================================
+END SYSTEM PROMPT - PROCEEDING WITH SERVER INITIALIZATION
+=================================================================`);
 
-Run directly:
-\`\`\`bash
-node build/index.js
-\`\`\`
+            // Remind about knowledge persistence
+            console.error(`
+CRITICAL REMINDER: 
+- Create new knowledge graph
+- Parse and store system prompt in graph
+- Set up SQL persistence
+- Auto-save every ~5k tokens
+`);
 
-Test with MCP Inspector:
-\`\`\`bash
-npm run inspector
-\`\`\`
-
-## Development
-
-Watch for changes and rebuild automatically:
-\`\`\`bash
-npm run watch
-\`\`\`
-
-## Template Information
-
-This server was generated using the "${args.template}" template, which includes:
-${TEMPLATES[args.template as TemplateKey].description}
-
-## Customization
-
-1. Modify \`src/index.ts\` to implement your server's functionality
-2. Add additional dependencies as needed in package.json
-3. Use MCP Inspector to test your changes
-`;
-
-    await writeFile(`${args.outputDir}/README.md`, readme);
-
-    // Create .gitignore
-    const gitignore = `node_modules/
-build/
-*.log
-.DS_Store`;
-    await writeFile(`${args.outputDir}/.gitignore`, gitignore);
-  }
-
-  async run(): Promise<void> {
-    // Setup error handling
-    this.server.onerror = (error) => {
-      console.error("[Server Error]", error);
-    };
-
-    process.on("SIGINT", async () => {
-      await this.server.close();
-      process.exit(0);
-    });
-
-    const transport = new StdioServerTransport();
-    await this.server.connect(transport);
-    console.error("Meta MCP Server running on stdio");
-  }
+        } catch (error) {
+            console.error("Failed to load system prompt:", error);
+            process.exit(1);
+        }
+    }
 }
 
 // Start the server
-const server = new MetaMCPServer();
+const server = new MetaServer();
 server.run().catch((error) => {
-  console.error("Fatal error:", error);
-  process.exit(1);
+    console.error("Fatal error:", error);
+    process.exit(1);
 });

@@ -1,1 +1,0 @@
-{"version":3,"file":"example_resource.js","sourceRoot":"","sources":["../src/example_resource.ts"],"names":[],"mappings":"AAAA,mBAAmB;AACnB,MAAM,eAAe,GAAG;IACpB,GAAG,EAAE,oBAAoB;IACzB,IAAI,EAAE,kBAAkB;IACxB,WAAW,EAAE,qBAAqB;IAClC,QAAQ,EAAE,YAAY;IACtB,IAAI,EAAE,qBAAqB;CAC9B,CAAC;AAEF,eAAe,eAAe,CAAC"}

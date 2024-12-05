@@ -1,1 +1,18 @@
-/node_modules
+# Build output
+build/
+
+# Dependencies
+node_modules/
+
+# IDE
+.vscode/
+.idea/
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+
+# Environment
+.env

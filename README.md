@@ -1,70 +1,100 @@
-# Meta MCP Server
+# create-mcp-server
 
-A tool for generating Model Context Protocol (MCP) servers based on templates.
+Interactive CLI tool to create Model Context Protocol (MCP) servers. This tool guides you through creating a customized MCP server and sets up a working development environment.
 
-## Usage
+## Quick Start
 
-### Installation
+Create a new MCP server:
+\`\`\`bash
+# Using npx (recommended)
+npx create-mcp-server
 
-```bash
-npm install
-npm run build
-```
+# Or install globally
+npm install -g create-mcp-server
+create-mcp-server
+\`\`\`
 
-### Running
-
-You can run the server directly:
-```bash
-node build/main.js
-```
-
-Or use MCP Inspector to test:
-```bash
-npm run inspector
-```
+Follow the interactive prompts to customize your server.
 
 ## Features
 
-The meta-server provides:
+- Interactive CLI with guided prompts
+- Multiple server templates:
+  - **Basic**: Simple server with no capabilities (for learning)
+  - **Resources**: Server that exposes data to Claude
+  - **Tools**: Server that lets Claude perform actions
+  - **Full**: Complete server with both resources and tools
+- Proper TypeScript setup
+- Development workflow with watch mode
+- Built-in MCP Inspector integration
+- Example implementations
 
-1. Different server templates:
-   - `basic`: Basic MCP server with no capabilities
-   - `resource-only`: Server with resource capabilities
-   - `tool-only`: Server with tool capabilities 
-   - `full`: Server with both resource and tool capabilities
+## Usage
 
-2. Resources:
-   - All templates are exposed as resources
-   - Access template code via the template:// URI scheme
+When you run the tool, it will guide you through:
 
-3. Tools:
-   - `create_mcp_server`: Generate a new MCP server based on a template
+1. Server name (package name format)
+2. Initial version 
+3. Template selection
+4. Output directory
 
-## Generating Servers
+The tool will create a complete server project with:
+- TypeScript configuration
+- Build scripts
+- Development tools
+- Example implementations
+- Testing setup
 
-To generate a new server, use the `create_mcp_server` tool with:
+## Development Workflow
 
-- `name`: Package name for your server (e.g., "my-mcp-server")
-- `version`: Initial version (e.g., "1.0.0")
-- `template`: Which template to use ("basic", "resource-only", "tool-only", or "full")
-- `outputDir`: Where to generate the server
+After creating your server:
 
-## Generated Server Structure
+1. Install dependencies:
+   \`\`\`bash
+   npm install
+   \`\`\`
 
-Each generated server includes:
+2. Start development mode:
+   \`\`\`bash
+   npm run dev
+   \`\`\`
 
-- `src/index.ts`: Main server implementation
-- `package.json`: NPM configuration
-- `tsconfig.json`: TypeScript configuration
-- `README.md`: Usage instructions
-- `.gitignore`: Git ignore rules
+3. Test with MCP Inspector:
+   \`\`\`bash
+   npm run inspector
+   \`\`\`
 
-## Development
+## Server Templates
 
-All templates include:
+### Basic Server
+- Minimal implementation
+- No capabilities
+- Good for learning MCP
 
-- Proper error handling
-- Process cleanup
-- Logging setup
-- Basic examples
-- Inspector integration
+### Resource Server
+- Exposes data to Claude
+- Example resource implementation
+- Resource listing and reading
+
+### Tool Server
+- Lets Claude perform actions
+- Example tool implementation
+- Tool listing and execution
+
+### Full Server
+- Both resources and tools
+- Complete example setup
+- Ready for real-world use
+
+## Contributing
+
+1. Clone the repository
+2. Install dependencies: \`npm install\`
+3. Build: \`npm run build\`
+4. Test your changes: \`npm start\`
+
+## Resources
+
+- [MCP Documentation](https://docs.modelcontextprotocol.ai)
+- [MCP TypeScript SDK](https://github.com/modelcontextprotocol/typescript-sdk)
+- [MCP Inspector](https://github.com/modelcontextprotocol/inspector)

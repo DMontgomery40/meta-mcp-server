@@ -2,10 +2,28 @@
   "name": "meta-mcp-server",
   "version": "1.0.0",
   "type": "module",
+  "description": "MCP server that helps Claude create other MCP servers with persistent knowledge",
   "main": "build/main.js",
+  "bin": {
+    "meta-mcp-server": "./build/main.js"
+  },
+  "private": false,
+  "mcp": {
+    "server": {
+      "command": "node",
+      "args": ["./build/main.js"]
+    }
+  },
+  "files": [
+    "build",
+    "README.md"
+  ],
   "scripts": {
     "build": "tsc",
-    "start": "node build/main.js"
+    "postbuild": "chmod +x build/main.js && cp src/SYSTEM_PROMPT.md build/",
+    "dev": "tsc --watch",
+    "start": "node build/main.js",
+    "prepublishOnly": "npm run build"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "0.6.0"
