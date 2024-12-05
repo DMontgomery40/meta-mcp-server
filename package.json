@@ -1,6 +1,6 @@
 {
   "name": "meta-mcp-server",
-  "version": "1.5.3",
+  "version": "1.5.4",
   "type": "module",
   "description": "MCP server that helps Claude create other MCP servers with persistent knowledge",
   "main": "build/main.js",
