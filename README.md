@@ -51,6 +51,7 @@ This will initialize the meta-server, which will be ready to accept instructions
     }
   ]
 }
+```
 This JSON can be sent via a suitable MCP client that communicates with the meta-server through the MCP protocol.
 
 Configuration
