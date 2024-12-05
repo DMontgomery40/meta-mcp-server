@@ -131,9 +131,9 @@ END SYSTEM PROMPT - PROCEEDING WITH SERVER INITIALIZATION
             console.error(`
 CRITICAL REMINDER: 
 - Create new knowledge graph
-- Parse and store system prompt in graph
-- Set up SQL persistence
-- Auto-save every ~5k tokens
+- Parse and store ${systemPrompt} in knowledge graph with memory tool
+- Set up SQL persistence with sqlite tool
+- Auto-save every ~5k tokens 
 `);
 
         } catch (error) {
