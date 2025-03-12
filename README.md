@@ -2,6 +2,10 @@
 
 "Meta" because it's an MCP Server that Creates MCP Servers. And also because "suck it, Zuck, I got it first" (seriously though I made that connection after the fact).
 
+<a href="https://glama.ai/mcp/servers/9ve9ntl1n3">
+  <img width="380" height="200" src="https://glama.ai/mcp/servers/9ve9ntl1n3/badge" alt="Meta Server MCP server" />
+</a>
+
 ## Features 
 
 AI (poorly) Created Content:
@@ -52,5 +56,3 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-
-
