@@ -2,6 +2,8 @@
 
 "Meta" because it's an MCP Server that Creates MCP Servers. And also because "suck it, Zuck, I got it first" (seriously though I made that connection after the fact).
 
+[![smithery badge](https://smithery.ai/badge/@DMontgomery40/meta-mcp-server)](https://smithery.ai/server/@DMontgomery40/meta-mcp-server)
+
 ## Features 
 
 AI (poorly) Created Content:
@@ -22,6 +24,14 @@ AI (poorly) Created Content:
       "args": ["-y", "meta-mcp-server"]
     }
   }
+```
+
+### Installing via Smithery
+
+To install Meta MCP Server for Claude Desktop automatically via [Smithery](https://smithery.ai/server/@DMontgomery40/meta-mcp-server):
+
+```bash
+npx -y @smithery/cli install @DMontgomery40/meta-mcp-server --client claude
 ```
 
 Security
