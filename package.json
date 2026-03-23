@@ -1,6 +1,6 @@
 {
   "name": "meta-mcp-server",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "type": "module",
   "description": "MCP server that helps create other MCP servers -- the original meta-MCP, now modernized",
   "main": "build/main.js",
@@ -25,7 +25,14 @@
     "type": "git",
     "url": "https://github.com/DMontgomery40/meta-mcp-server.git"
   },
-  "keywords": ["mcp", "server", "modelcontextprotocol", "meta", "generator", "code-execution"],
+  "keywords": [
+    "mcp",
+    "server",
+    "modelcontextprotocol",
+    "meta",
+    "generator",
+    "code-execution"
+  ],
   "author": "David Montgomery",
   "license": "MIT",
   "engines": {
