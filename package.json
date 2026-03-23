@@ -1,19 +1,13 @@
 {
   "name": "meta-mcp-server",
-  "version": "1.5.4",
+  "version": "2.0.0",
   "type": "module",
-  "description": "MCP server that helps Claude create other MCP servers with persistent knowledge",
+  "description": "MCP server that helps create other MCP servers -- the original meta-MCP, now modernized",
   "main": "build/main.js",
   "bin": {
     "meta-mcp-server": "./build/main.js"
   },
   "private": false,
-  "mcp": {
-    "server": {
-      "command": "node",
-      "args": ["./build/main.js"]
-    }
-  },
   "files": [
     "build",
     "README.md",
@@ -21,21 +15,28 @@
   ],
   "scripts": {
     "build": "tsc",
-    "postbuild": "chmod +x build/main.js && cp src/SYSTEM_PROMPT.md build/",
     "dev": "tsc --watch",
     "start": "node build/main.js",
-    "publish": "npm publish --access public"},
+    "start:http": "node build/main.js --http",
+    "test": "node --test build/test/*.js",
+    "publish": "npm publish --access public"
+  },
   "repository": {
     "type": "git",
-    "url": "https://github.com/DMontgomery40/meta-mcp-server.git"},
-  "keywords": ["canvas", "mcp", "server", "modelcontextprotocol"],
+    "url": "https://github.com/DMontgomery40/meta-mcp-server.git"
+  },
+  "keywords": ["mcp", "server", "modelcontextprotocol", "meta", "generator", "code-execution"],
   "author": "David Montgomery",
   "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "latest"
+    "@modelcontextprotocol/sdk": "^1.27.1",
+    "zod": "^3.25.0"
   },
   "devDependencies": {
-    "@types/node": "^20.11.24",
-    "typescript": "^5.3.3"
+    "@types/node": "^22.10.0",
+    "typescript": "^5.7.2"
   }
 }
